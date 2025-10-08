@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://72.60.204.7:8080/api';
+const API_BASE_URL = 'https://api.sangameshwarnetcafe.in/api';
 let currentEditingServiceId = null;
 let currentEnquiryId = null;
 let enquiriesData = []; 
