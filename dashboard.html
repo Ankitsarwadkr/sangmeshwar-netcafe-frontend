@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Sangameshwar Net Cafe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {}
+    }
+  }
+</script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        
+        body {
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .glass-effect {
+            background: white;
+            border: 1px solid #e2e8f0;
+        }
+
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .modal {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .badge-new {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+        }
+
+        .badge-in-progress {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .badge-resolved {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .tab-btn {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: #6366f1;
+            color: white;
+        }
+
+        .gradient-btn {
+            background: #6366f1;
+            transition: all 0.3s ease;
+        }
+
+        .gradient-btn:hover {
+            background: #4f46e5;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .form-input, .form-select {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px 14px;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="glass-effect shadow-sm sticky top-0 z-50 border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-indigo-600 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold text-gray-900">Sangameshwar Net Cafe</h1>
+                        <p class="text-xs text-gray-500">Admin Dashboard</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Tabs -->
+        <div class="glass-effect rounded-lg p-1 mb-6 shadow-sm inline-flex">
+            <button onclick="switchTab('services')" id="servicesTab" class="tab-btn active px-6 py-2.5 rounded-md text-sm font-medium transition-all flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                Services
+            </button>
+            <button onclick="switchTab('enquiries')" id="enquiriesTab" class="tab-btn px-6 py-2.5 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                Enquiries
+                <span id="enquiryBadge" class="hidden px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded-full"></span>
+            </button>
+        </div>
+
+        <!-- Services Tab -->
+        <div id="servicesContent" class="tab-content">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900">Services</h2>
+                    <p class="text-sm text-gray-600">Manage your cafe services</p>
+                </div>
+                <button onclick="openServiceModal()" class="gradient-btn px-5 py-2.5 text-white rounded-lg font-medium shadow-sm flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Add Service
+                </button>
+            </div>
+
+            <div id="servicesLoading" class="flex justify-center items-center h-64">
+                <div class="spinner" style="width: 48px; height: 48px; border-width: 4px;"></div>
+            </div>
+
+            <div id="servicesEmpty" class="hidden glass-effect rounded-lg p-12 text-center">
+                <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                </svg>
+                <p class="text-gray-600 text-lg font-semibold mb-2">No services found</p>
+                <p class="text-gray-500 text-sm mb-4">Get started by adding your first service</p>
+                <button onclick="openServiceModal()" class="gradient-btn px-5 py-2.5 text-white rounded-lg font-medium shadow-sm">
+                    Add Service
+                </button>
+            </div>
+
+            <div id="servicesGrid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+
+        <!-- Enquiries Tab -->
+        <div id="enquiriesContent" class="tab-content hidden">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Enquiries</h2>
+                    <p class="text-sm text-gray-600">Manage customer enquiries</p>
+            </div>
+                        <div class="mb-4">
+                    <select id="statusFilter" class="form-select w-48">
+                        <option value="">All</option>
+                        <option value="NEW">New</option>
+                        <option value="IN_PROGRESS">In Progress</option>
+                        <option value="RESOLVED">Resolved</option>
+                    </select>
+                    </div>
+
+            <div id="enquiriesLoading" class="flex justify-center items-center h-64">
+                <div class="spinner" style="width: 48px; height: 48px; border-width: 4px;"></div>
+            </div>
+
+            <div id="enquiriesEmpty" class="hidden glass-effect rounded-lg p-12 text-center">
+                <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                <p class="text-gray-600 text-lg font-semibold mb-2">No enquiries found</p>
+                <p class="text-gray-500 text-sm">Customer enquiries will appear here</p>
+            </div>
+
+            <div id="enquiriesGrid" class="hidden space-y-4"></div>
+        </div>
+    </div>
+
+    <!-- Service Modal -->
+    <div id="serviceModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">
+        <div class="modal-content bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-xl">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-900" id="serviceModalTitle">Create New Service</h2>
+                        <p class="text-gray-600 text-sm mt-0.5" id="serviceModalDesc">Fill in the details</p>
+                    </div>
+                    <button onclick="closeServiceModal()" class="text-gray-400 hover:text-gray-600 p-1.5 hover:bg-gray-100 rounded-lg transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <form id="serviceForm" class="p-6 space-y-5">
+                <input type="hidden" id="serviceId">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Service Image</label>
+                    <div id="imagePreview" class="hidden mb-3 relative group">
+                        <img id="previewImg" src="" alt="Preview" class="w-full h-48 object-cover rounded-lg border border-gray-200">
+                        <button type="button" onclick="removeImage()" class="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-lg hover:bg-red-600 shadow-lg transition-all opacity-0 group-hover:opacity-100">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <input type="file" id="imageFile" accept="image/*" onchange="handleImageChange(this)" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition-all cursor-pointer">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-semibold text-gray-900 pb-2 border-b">English Details</h3>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Title *</label>
+                            <input type="text" id="titleEn" required class="form-input w-full" placeholder="Enter title">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Description *</label>
+                            <textarea id="descriptionEn" required rows="3" class="form-input w-full" placeholder="Enter description"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Category *</label>
+                            <select id="categoryEn" required class="form-select w-full">
+                                <option value="">Select category</option>
+                                <option value="EPFO">EPFO</option>
+                                <option value="New Openings">New Openings</option>
+                                <option value="Government Schemes">Government Schemes</option>
+                                <option value="General Services">General Services</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-semibold text-gray-900 pb-2 border-b">Marathi Details (Optional)</h3>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">शीर्षक</label>
+                            <input type="text" id="titleMr" class="form-input w-full" placeholder="शीर्षक प्रविष्ट करा">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">वर्णन</label>
+                            <textarea id="descriptionMr" rows="3" class="form-input w-full" placeholder="वर्णन प्रविष्ट करा"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">श्रेणी</label>
+                            <select id="categoryMr" class="form-select w-full">
+                                <option value="">श्रेणी निवडा</option>
+                                <option value="ईपीएफओ">ईपीएफओ</option>
+                                <option value="नवीन संधी">नवीन संधी</option>
+                                <option value="सरकारी योजना">सरकारी योजना</option>
+                                <option value="सामान्य सेवा">सामान्य सेवा</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div>
+                            <label class="text-sm font-medium text-gray-900">Active</label>
+                            <p class="text-xs text-gray-500">Visible to users</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="isActive" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div>
+                            <label class="text-sm font-medium text-gray-900">Featured</label>
+                            <p class="text-xs text-gray-500">Homepage</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="isFeatured" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-yellow-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-500"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 justify-end pt-4 border-t border-gray-200">
+                    <button type="button" onclick="closeServiceModal()" class="px-5 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all font-medium text-sm">
+                        Cancel
+                    </button>
+                    <button type="submit" id="serviceSubmitBtn" class="gradient-btn px-5 py-2.5 text-white rounded-lg font-medium shadow-sm flex items-center gap-2 text-sm">
+                        <span id="serviceSubmitText">Create Service</span>
+                        <div id="serviceSubmitSpinner" class="spinner hidden" style="width: 16px; height: 16px; border-width: 2px;"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Enquiry Modal -->
+    <div id="enquiryModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">
+
+        <div class="modal-content bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="sticky top-0 bg-white border-b border-gray-200 px-8 py-6 rounded-t-2xl">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900">Enquiry Details</h2>
+                        <p class="text-gray-600 text-sm mt-1">View and update status</p>
+                    </div>
+                    <button onclick="closeEnquiryModal()" class="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-all">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-8">
+                <div id="enquiryDetails" class="space-y-6 mb-6"></div>
+
+                <div class="border-t border-gray-200 pt-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-3">Update Status</label>
+                    <select id="enquiryStatus" class="status-select w-full">
+                        <option value="NEW">New</option>
+                        <option value="IN_PROGRESS">In Progress</option>
+                        <option value="RESOLVED">Resolved</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-3 justify-end pt-6">
+                    <button onclick="closeEnquiryModal()" class="px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all font-medium">
+                        Close
+                    </button>
+                    <button onclick="updateEnquiryStatus()" id="updateStatusBtn" class="gradient-btn px-6 py-3 text-white rounded-xl font-medium shadow-lg flex items-center gap-2">
+                        <span id="updateStatusText">Update Status</span>
+                        <div id="updateStatusSpinner" class="spinner hidden" style="width: 20px; height: 20px; border-width: 2px;"></div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-[60] space-y-2"></div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
