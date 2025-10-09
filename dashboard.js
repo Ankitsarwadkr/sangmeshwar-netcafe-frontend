@@ -190,7 +190,7 @@ function openServiceModal(service = null) {
         document.getElementById('isFeatured').checked = service.isFeatured ?? false;
         
         if (service.imageUrl) {
-            document.getElementById('previewImg').src = `${API_BASE_URL.replace('/api', '')}/uploads/${service.imageUrl}`;
+            document.getElementById('previewImg').src = `${API_BASE_URL}${service.imageUrl.startsWith('/') ? service.imageUrl : '/' + service.imageUrl}`;
             document.getElementById('imagePreview').classList.remove('hidden');
         }
     } else {
