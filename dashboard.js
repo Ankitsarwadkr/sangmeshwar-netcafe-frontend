@@ -119,14 +119,9 @@ function displayServices(services) {
     grid.innerHTML = services.map(service => `
         <div class="card-hover glass-effect rounded-lg overflow-hidden">
             ${service.imageUrl ? `
-                <img 
-  src="${service.imageUrl.startsWith('http') 
-      ? service.imageUrl 
-      : `${API_BASE_URL.replace('/api', '')}/${service.imageUrl.replace(/^\/+/, '')}`}" 
-  alt="${service.titleEn}" 
-  class="w-full h-44 object-cover rounded-t-lg"
-/>
-
+                <img src="${API_BASE_URL.replace('/api', '')}/uploads/${service.imageUrl.replace(/^.*[\\\/]/, '')}" 
+                     alt="${service.titleEn}" 
+                     class="w-full h-44 object-cover">
             ` : `
                 <div class="w-full h-44 bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center">
                     <svg class="w-12 h-12 text-white opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
