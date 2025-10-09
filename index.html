@@ -633,7 +633,7 @@ if (phone && !/^\d{10}$/.test(phone)) {
         const res = await fetch(API_URL);
         
         if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
+          throw new Error(`HTTPS error! status: ${res.status}`);
         }
         
         servicesData = await res.json();
