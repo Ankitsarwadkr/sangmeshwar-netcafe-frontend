@@ -696,19 +696,30 @@ if (phone && !/^\d{10}$/.test(phone)) {
           
           const img = document.createElement("img");
           
-          img.src = `${BASE_URL}${service.imageUrl.startsWith('/') ? service.imageUrl : '/' + service.imageUrl}`;
+         // Build the full image URL
+          const imageUrl = service.imageUrl.startsWith('/')
+            ? `${BASE_URL}${service.imageUrl}`
+            : `${BASE_URL}/${service.imageUrl}`;
 
-
+          img.src = imageUrl;
           img.alt = service[currentLang === "en" ? "titleEn" : "titleMr"];
           img.className = "w-full h-full object-cover image-hover";
+          img.fetchPriority = 'high';
           img.loading = "lazy";
-          
-         img.onerror = function() {
-  img.src = 'path/to/placeholder.png';
+
+          // Fallback if image fails to load
+          img.onerror = () => {
+            img.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="400" height="300" fill="%23ccc"/><text x="200" y="150" font-size="20" text-anchor="middle" fill="%23666">No Image</text></svg>';
 };
+
 
           
           imgContainer.appendChild(img);
+          // Optional SEO fallback for search engines
+        const noscript = document.createElement('noscript');
+        noscript.innerHTML = `<img src="${imageUrl}" alt="${img.alt}" class="w-full h-full object-cover">`;
+imgContainer.appendChild(noscript);
+
           card.appendChild(imgContainer);
 
           // Content
@@ -767,7 +778,10 @@ if (phone && !/^\d{10}$/.test(phone)) {
     });
 
     // Initial fetch
-    fetchServices();
+    window.addEventListener('DOMContentLoaded', () => {
+  fetchServices();
+});
+
   </script>
 
 </body>
