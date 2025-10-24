@@ -119,9 +119,11 @@ function displayServices(services) {
     grid.innerHTML = services.map(service => `
         <div class="card-hover glass-effect rounded-lg overflow-hidden">
             ${service.imageUrl ? `
-                <img src="${API_BASE_URL.replace('/api', '')}/uploads/${service.imageUrl.replace(/^.*[\\\/]/, '')}" 
-                     alt="${service.titleEn}" 
-                     class="w-full h-44 object-cover">
+              <img src="${API_BASE_URL}/uploads/${service.imageUrl}" 
+     alt="${service.titleEn}" 
+     class="w-full h-44 object-cover">
+
+
             ` : `
                 <div class="w-full h-44 bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center">
                     <svg class="w-12 h-12 text-white opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -190,7 +192,7 @@ function openServiceModal(service = null) {
         document.getElementById('isFeatured').checked = service.isFeatured ?? false;
         
         if (service.imageUrl) {
-            document.getElementById('previewImg').src = `${API_BASE_URL.replace('/api', '')}/uploads/${service.imageUrl}`;
+            document.getElementById('previewImg').src = `https://api.sangameshwarnetcafe.in/uploads/${service.imageUrl}`;
             document.getElementById('imagePreview').classList.remove('hidden');
         }
     } else {
